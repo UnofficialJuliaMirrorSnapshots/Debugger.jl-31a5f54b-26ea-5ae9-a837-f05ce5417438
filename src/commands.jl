@@ -131,12 +131,12 @@ end
 function execute_command(state::DebuggerState, v::Union{Val{:up}, Val{:down}}, cmd::AbstractString)
     args = split(cmd, " ")[2:end]
     if isempty(args)
-        offset = v == Val(:up) ? -1 : +1
+        offset = v == Val(:up) ? +1 : -1
     else
         length(args) > 1 && return invalid_command(state, cmd)
         offset = tryparse(Int, args[1])
         offset == nothing && return invalid_command(state, cmd)
-        v == Val(:up) && (offset *= -1)
+        v == Val(:down) && (offset *= -1)
     end
     return execute_command(state, Val(:f), string("f ", state.level + offset))
 end
@@ -280,7 +280,7 @@ function execute_command(state::DebuggerState, ::Union{Val{:help}, Val{:?}}, cmd
             Breakpoints:\\
             - `bp add`\\
                 - `bp add "file.jl":line`: add a breakpoint att file `file.jl` on line `line`\\
-                - `bp add func`[:line]`: add a breakpoint to function `func` at line `line` (defaulting to first line)\\
+                - `bp add func [:line]`: add a breakpoint to function `func` at line `line` (defaulting to first line)\\
                 - `bp add func(::Float64, Int)[:line]`: add a breakpoint to methods matching the signature at line `line` (defaulting to first line)\\
                 - `bp add func(x, y)[:line]`: add a breakpoint to the method matching the types of the local variable `x`, `y` etc.\\
                 - `bp add line` add a breakpoint to `line` of the file of the current function\\
